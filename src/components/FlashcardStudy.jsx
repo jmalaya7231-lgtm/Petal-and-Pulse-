@@ -1,19 +1,14 @@
 import { useState } from "react";
 import { ArrowLeft, ChevronLeft, ChevronRight, Shuffle, Check } from "lucide-react";
-
-function shuffled(list) {
-  const copy = [...list];
-  for (let i = copy.length - 1; i > 0; i--) {
-    const j = Math.floor(Math.random() * (i + 1));
-    [copy[i], copy[j]] = [copy[j], copy[i]];
-  }
-  return copy;
-}
+import { shuffled } from "../lib/shuffle.js";
+import Celebrate from "./Celebrate.jsx";
 
 export default function FlashcardStudy({ ids, cards, onSetReviewed, onExit }) {
   const [order, setOrder] = useState(ids);
   const [index, setIndex] = useState(0);
   const [revealed, setRevealed] = useState(false);
+  const [dir, setDir] = useState("next");
+  const [celebrate, setCelebrate] = useState(false);
 
   const byId = new Map(cards.map((c) => [c.id, c]));
   const card = byId.get(order[index]);
@@ -35,17 +30,29 @@ export default function FlashcardStudy({ ids, cards, onSetReviewed, onExit }) {
   const percent = Math.round((reviewedCount / order.length) * 100);
 
   function go(newIndex) {
+    setDir(newIndex > index ? "next" : "prev");
     setIndex(newIndex);
     setRevealed(false);
   }
 
   function shuffleCards() {
     setOrder(shuffled(order));
-    go(0);
+    setDir("next");
+    setIndex(0);
+    setRevealed(false);
+  }
+
+  function toggleReviewed() {
+    const making = !card.reviewed;
+    onSetReviewed(card.id, making);
+    // Celebrate only when she really has reviewed every card in this round
+    if (making && reviewedCount + 1 === order.length) setCelebrate(true);
   }
 
   return (
     <div className="stack">
+      {celebrate && <Celebrate onDone={() => setCelebrate(false)} />}
+
       <div>
         <button className="btn btn-outline" onClick={onExit}>
           <ArrowLeft size={18} /> Back to cards
@@ -75,26 +82,28 @@ export default function FlashcardStudy({ ids, cards, onSetReviewed, onExit }) {
         </div>
       </div>
 
-      <button
-        className={`flashcard ${revealed ? "revealed" : ""}`}
-        onClick={() => setRevealed(!revealed)}
-        aria-live="polite"
-      >
-        {revealed ? (
-          <>
-            <span className="flash-q">{card.front}</span>
-            <span className="flash-label">Answer</span>
-            <span className="flash-text">{card.back}</span>
-            <span className="muted small">Tap to hide the answer</span>
-          </>
-        ) : (
-          <>
-            <span className="flash-label">Question</span>
-            <span className="flash-text">{card.front}</span>
-            <span className="muted small">Tap to reveal the answer</span>
-          </>
-        )}
-      </button>
+      {/* The key makes each new card start fresh, so the next answer is never shown while turning */}
+      <div key={card.id} className={`card-stage slide-${dir}`}>
+        <button
+          type="button"
+          className={`flip ${revealed ? "is-flipped" : ""}`}
+          onClick={() => setRevealed(!revealed)}
+        >
+          <span className="flip-inner">
+            <span className="flip-face flip-front" aria-hidden={revealed}>
+              <span className="flash-label">Question</span>
+              <span className="flash-text">{card.front}</span>
+              <span className="muted small">Tap to reveal the answer</span>
+            </span>
+            <span className="flip-face flip-back" aria-hidden={!revealed}>
+              <span className="flash-q">{card.front}</span>
+              <span className="flash-label">Answer</span>
+              <span className="flash-text">{card.back}</span>
+              <span className="muted small">Tap to flip back</span>
+            </span>
+          </span>
+        </button>
+      </div>
 
       <div className="pager">
         <button
@@ -122,12 +131,20 @@ export default function FlashcardStudy({ ids, cards, onSetReviewed, onExit }) {
 
       <button
         className={`btn ${card.reviewed ? "btn-soft" : "btn-primary"}`}
-        onClick={() => onSetReviewed(card.id, !card.reviewed)}
+        onClick={toggleReviewed}
       >
-        <Check size={18} /> {card.reviewed ? "Reviewed (tap to undo)" : "Mark as reviewed"}
+        <span key={card.reviewed ? "done" : "todo"} className="pop">
+          <Check size={18} />
+        </span>
+        {card.reviewed ? "Reviewed (tap to undo)" : "Mark as reviewed"}
       </button>
 
-      {index === order.length - 1 && (
+      {reviewedCount === order.length && (
+        <p className="small" style={{ margin: 0, textAlign: "center", fontWeight: 700 }}>
+          You've reviewed every card in this round. 💗
+        </p>
+      )}
+      {reviewedCount !== order.length && index === order.length - 1 && (
         <p className="muted small" style={{ margin: 0, textAlign: "center" }}>
           That's the last card. Nice work. 💗
         </p>
