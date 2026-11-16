@@ -58,9 +58,6 @@
   border-top: 1px solid var(--border);
   box-shadow: 0 -6px 18px rgba(196, 69, 120, 0.12);
 }
-@media (min-width: 900px) {
-  .hl-bar { left: 260px; }
-}
 
 .hl-bar-inner {
   display: flex;
