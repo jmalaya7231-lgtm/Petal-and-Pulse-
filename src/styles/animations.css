@@ -68,3 +68,47 @@
   .edge-handle { animation: none !important; }
   .btn-primary::after { display: none; }
 }
+/* ---------- Soft drifting light behind every page ---------- */
+.ambient {
+  position: fixed;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  overflow: hidden;
+}
+.ambient::before,
+.ambient::after {
+  content: "";
+  position: absolute;
+  width: 60vmax;
+  height: 60vmax;
+  border-radius: 50%;
+  will-change: transform;
+}
+.ambient::before {
+  top: -25vmax;
+  right: -20vmax;
+  background: radial-gradient(circle, rgba(248, 187, 208, 0.38), transparent 65%);
+  animation: drift-a 26s ease-in-out infinite alternate;
+}
+.ambient::after {
+  bottom: -30vmax;
+  left: -20vmax;
+  background: radial-gradient(circle, rgba(252, 231, 240, 0.9), transparent 65%);
+  animation: drift-b 32s ease-in-out infinite alternate;
+}
+@keyframes drift-a {
+  to { transform: translate(-6vmax, 8vmax) scale(1.08); }
+}
+@keyframes drift-b {
+  to { transform: translate(8vmax, -6vmax) scale(1.1); }
+}
+
+/* Checkboxes squish a little when pressed */
+.check input { transition: transform 0.15s ease; }
+.check input:active { transform: scale(0.8); }
+
+@media (prefers-reduced-motion: reduce) {
+  .ambient::before,
+  .ambient::after { animation: none; }
+}
