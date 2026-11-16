@@ -13,9 +13,58 @@
       href="https://fonts.googleapis.com/css2?family=Nunito:wght@400;600;700;800&display=swap"
       rel="stylesheet"
     />
+
+    <style>
+      body { margin: 0; background: #fffafc; }
+      .boot {
+        min-height: 100vh;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        gap: 18px;
+        color: #c44578;
+        font-family: "Nunito", system-ui, sans-serif;
+        font-weight: 700;
+      }
+      .boot svg { width: 76px; height: 76px; }
+      .boot .boot-petals {
+        transform-origin: 24px 24px;
+        animation: boot-spin 7s linear infinite;
+      }
+      .boot p { margin: 0; animation: boot-fade 1.8s ease-in-out infinite; }
+      @keyframes boot-spin { to { transform: rotate(360deg); } }
+      @keyframes boot-fade { 50% { opacity: 0.35; } }
+      @media (prefers-reduced-motion: reduce) {
+        .boot .boot-petals, .boot p { animation: none; }
+      }
+    </style>
   </head>
   <body>
-    <div id="root"></div>
+    <div id="root">
+      <div class="boot" role="status" aria-label="Loading">
+        <svg viewBox="0 0 48 48" aria-hidden="true">
+          <g class="boot-petals" fill="#F8BBD0">
+            <ellipse cx="24" cy="12" rx="7" ry="10" />
+            <ellipse cx="24" cy="12" rx="7" ry="10" transform="rotate(72 24 24)" />
+            <ellipse cx="24" cy="12" rx="7" ry="10" transform="rotate(144 24 24)" />
+            <ellipse cx="24" cy="12" rx="7" ry="10" transform="rotate(216 24 24)" />
+            <ellipse cx="24" cy="12" rx="7" ry="10" transform="rotate(288 24 24)" />
+          </g>
+          <circle cx="24" cy="24" r="10" fill="#FFFFFF" />
+          <polyline
+            points="16,24 20,24 22,19 26,29 28,24 32,24"
+            fill="none"
+            stroke="#C44578"
+            stroke-width="2"
+            stroke-linecap="round"
+            stroke-linejoin="round"
+          />
+        </svg>
+        <p>Petal &amp; Pulse</p>
+      </div>
+    </div>
+    <noscript>Petal &amp; Pulse needs JavaScript to run.</noscript>
     <script type="module" src="/src/main.jsx"></script>
   </body>
 </html>
