@@ -1,0 +1,225 @@
+/* ---------- Celebration burst ---------- */
+.celebrate {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  overflow: hidden;
+  pointer-events: none;
+}
+.confetti-petal {
+  position: absolute;
+  left: 50%;
+  top: 38%;
+  border-radius: 80% 0 80% 0;
+  opacity: 0;
+  animation: petal-burst var(--t) cubic-bezier(0.2, 0.7, 0.3, 1) var(--d) forwards;
+}
+@keyframes petal-burst {
+  0% {
+    opacity: 0;
+    transform: translate(0, 0) scale(0.3) rotate(0deg);
+  }
+  12% { opacity: 1; }
+  35% {
+    transform: translate(calc(var(--dx) * 0.6), calc(var(--rise) * -1)) scale(1)
+      rotate(calc(var(--rot) * 0.4));
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--dx), var(--fall)) scale(0.9) rotate(var(--rot));
+  }
+}
+
+/* ---------- Flashcard flip ---------- */
+.flip {
+  display: block;
+  width: 100%;
+  padding: 0;
+  color: var(--text);
+  text-align: center;
+  background: none;
+  border: none;
+  cursor: pointer;
+  perspective: 1400px;
+  -webkit-tap-highlight-color: transparent;
+}
+.flip:focus-visible {
+  outline: 3px solid var(--soft-pink);
+  outline-offset: 4px;
+  border-radius: var(--radius-lg);
+}
+
+.flip-inner {
+  position: relative;
+  display: grid;
+  min-height: 270px;
+  transform-style: preserve-3d;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.flip.is-flipped .flip-inner { transform: rotateY(180deg); }
+
+.flip-face {
+  grid-area: 1 / 1;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: var(--space-3);
+  padding: var(--space-6) var(--space-5);
+  background: var(--white);
+  border: 1px solid var(--border);
+  border-radius: var(--radius-lg);
+  box-shadow: var(--shadow-sm);
+  -webkit-backface-visibility: hidden;
+  backface-visibility: hidden;
+  transition: border-color var(--transition);
+}
+.flip:hover .flip-face { border-color: var(--soft-pink); }
+.flip-back {
+  transform: rotateY(180deg);
+  background: linear-gradient(160deg, var(--pale-pink), #ffffff 130%);
+  border-color: var(--soft-pink);
+}
+
+/* The next or previous card slides in from the side */
+.card-stage { animation: slide-in-next 0.45s cubic-bezier(0.22, 1, 0.36, 1) backwards; }
+.card-stage.slide-prev { animation-name: slide-in-prev; }
+@keyframes slide-in-next {
+  from { opacity: 0; transform: translateX(34px); }
+  to   { opacity: 1; transform: none; }
+}
+@keyframes slide-in-prev {
+  from { opacity: 0; transform: translateX(-34px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* The little check mark when a card is reviewed */
+.pop {
+  display: inline-flex;
+  animation: pop 0.4s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes pop {
+  0%   { opacity: 0; transform: scale(0.4); }
+  70%  { transform: scale(1.25); }
+  100% { opacity: 1; transform: scale(1); }
+}
+
+/* ---------- Quiz feedback ---------- */
+.q-enter { animation: rise-in 0.4s ease backwards; }
+.quiz-option.correct { animation: pop-correct 0.5s cubic-bezier(0.22, 1, 0.36, 1); }
+.quiz-option.wrong { animation: shake 0.45s ease; }
+
+@keyframes pop-correct {
+  0%   { transform: scale(1); }
+  45%  { transform: scale(1.025); }
+  100% { transform: scale(1); }
+}
+@keyframes shake {
+  0%, 100% { transform: translateX(0); }
+  20% { transform: translateX(-7px); }
+  40% { transform: translateX(7px); }
+  60% { transform: translateX(-5px); }
+  80% { transform: translateX(4px); }
+}
+
+.score-card .ring circle:first-child { stroke: var(--white); }
+
+/* Messages (errors, success) ease in */
+.alert[role="alert"],
+.alert[role="status"] { animation: rise-in 0.35s ease backwards; }
+
+/* ---------- Lesson view switching ---------- */
+.view-fade { animation: view-in 0.5s ease backwards; }
+@keyframes view-in {
+  from { opacity: 0; transform: translateY(10px); }
+  to   { opacity: 1; transform: none; }
+}
+
+/* ---------- Lists and tiles fade in one after another ---------- */
+.doc-list > *,
+.stat-grid > * {
+  animation: rise-in 0.5s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+  animation-delay: 360ms;
+}
+.doc-list > :nth-child(1), .stat-grid > :nth-child(1) { animation-delay: 0ms; }
+.doc-list > :nth-child(2), .stat-grid > :nth-child(2) { animation-delay: 60ms; }
+.doc-list > :nth-child(3), .stat-grid > :nth-child(3) { animation-delay: 120ms; }
+.doc-list > :nth-child(4), .stat-grid > :nth-child(4) { animation-delay: 180ms; }
+.doc-list > :nth-child(5) { animation-delay: 240ms; }
+.doc-list > :nth-child(6) { animation-delay: 300ms; }
+
+/* Chart bars grow up from the bottom */
+.bar-fill {
+  transform-origin: bottom;
+  animation: grow-up 0.8s cubic-bezier(0.22, 1, 0.36, 1) backwards;
+}
+@keyframes grow-up {
+  from { transform: scaleY(0); }
+}
+
+/* ---------- Floral page headers (Library, Planner, Progress, Notes and more) ---------- */
+.page-enter > .stack > div:first-child:has(> h1) {
+  position: relative;
+  overflow: hidden;
+  padding: var(--space-5) 120px var(--space-5) var(--space-5);
+  background: linear-gradient(120deg, #ffffff 0%, var(--pale-pink) 125%);
+  border: 1px solid var(--soft-pink);
+  border-radius: 24px;
+}
+.page-enter > .stack > div:first-child:has(> h1) > * {
+  position: relative;
+  z-index: 1;
+}
+.page-enter > .stack > div:first-child:has(> h1) > h1 { margin: 0 0 var(--space-1); }
+.page-enter > .stack > div:first-child:has(> h1) > p { margin: 0; }
+
+.page-enter > .stack > div:first-child:has(> h1)::after {
+  content: "";
+  position: absolute;
+  top: -26px;
+  right: -22px;
+  width: 128px;
+  height: 128px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg fill='%23F8BBD0'%3E%3Cellipse cx='24' cy='12' rx='7' ry='10'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(288 24 24)'/%3E%3C/g%3E%3Ccircle cx='24' cy='24' r='4.5' fill='%23ffffff' fill-opacity='.85'/%3E%3C/svg%3E")
+    no-repeat center / contain;
+  opacity: 0.9;
+  pointer-events: none;
+  animation: float-a 9s ease-in-out infinite;
+}
+.page-enter > .stack > div:first-child:has(> h1)::before {
+  content: "";
+  position: absolute;
+  bottom: -14px;
+  right: 82px;
+  width: 46px;
+  height: 46px;
+  background: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 48 48'%3E%3Cg fill='%23F4A7C3'%3E%3Cellipse cx='24' cy='12' rx='7' ry='10'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(72 24 24)'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(144 24 24)'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(216 24 24)'/%3E%3Cellipse cx='24' cy='12' rx='7' ry='10' transform='rotate(288 24 24)'/%3E%3C/g%3E%3Ccircle cx='24' cy='24' r='4.5' fill='%23ffffff' fill-opacity='.85'/%3E%3C/svg%3E")
+    no-repeat center / contain;
+  opacity: 0.8;
+  pointer-events: none;
+  animation: float-b 7s ease-in-out infinite;
+}
+
+@media (max-width: 560px) {
+  .page-enter > .stack > div:first-child:has(> h1) { padding-right: var(--space-5); }
+  .page-enter > .stack > div:first-child:has(> h1)::after { width: 88px; height: 88px; opacity: 0.45; }
+  .page-enter > .stack > div:first-child:has(> h1)::before { display: none; }
+}
+
+/* ---------- Reduced motion ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .flip-inner { transition: none; }
+  .card-stage,
+  .pop,
+  .q-enter,
+  .quiz-option.correct,
+  .quiz-option.wrong,
+  .alert[role="alert"],
+  .alert[role="status"],
+  .view-fade,
+  .doc-list > *,
+  .stat-grid > *,
+  .bar-fill,
+  .page-enter > .stack > div:first-child:has(> h1)::after,
+  .page-enter > .stack > div:first-child:has(> h1)::before { animation: none !important; }
+}
