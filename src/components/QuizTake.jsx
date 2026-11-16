@@ -1,6 +1,9 @@
-import NoteCard from "./NoteCard.jsx";
 import { useState } from "react";
 import { ArrowLeft, RotateCcw, Check, X } from "lucide-react";
+import NoteCard from "./NoteCard.jsx";
+import Celebrate from "./Celebrate.jsx";
+import ProgressRing from "./ProgressRing.jsx";
+import CountUp from "./CountUp.jsx";
 
 const LETTERS = ["A", "B", "C", "D"];
 
@@ -18,6 +21,7 @@ export default function QuizTake({
   const [checked, setChecked] = useState(false);
   const [answers, setAnswers] = useState([]); // { question, selected }
   const [finished, setFinished] = useState(false);
+  const [celebrate, setCelebrate] = useState(false);
 
   const q = questions[index];
 
@@ -32,6 +36,8 @@ export default function QuizTake({
     if (index === questions.length - 1) {
       const score = newAnswers.filter((a) => a.selected === a.question.correctIndex).length;
       if (record) onComplete(score, newAnswers.length);
+      // A celebration only follows a real score of 70% or more
+      if (score / newAnswers.length >= 0.7) setCelebrate(true);
       setFinished(true);
     } else {
       setIndex(index + 1);
@@ -49,6 +55,8 @@ export default function QuizTake({
 
     return (
       <div className="stack">
+        {celebrate && <Celebrate onDone={() => setCelebrate(false)} />}
+
         <div>
           <button className="btn btn-outline" onClick={onExit}>
             <ArrowLeft size={18} /> Back to quizzes
@@ -57,8 +65,19 @@ export default function QuizTake({
 
         <div className="card card-soft score-card">
           <span className="flash-label">Your result</span>
+          <ProgressRing
+            percent={percent}
+            size={104}
+            stroke={10}
+            label={`${percent} percent correct`}
+          />
           <div className="score-big">
-            {score} / {total}
+            <span className="sr-only">
+              {score} / {total}
+            </span>
+            <span aria-hidden="true">
+              <CountUp value={score} /> / {total}
+            </span>
           </div>
           <div className="muted">{percent}% correct</div>
           <p className="small muted" style={{ margin: 0 }}>
@@ -83,6 +102,7 @@ export default function QuizTake({
         </div>
 
         <NoteCard category={percent >= 70 ? "congrats" : "general"} compact />
+
         {missed.length === 0 ? (
           <div className="alert alert-success">
             <Check size={18} />
@@ -99,8 +119,7 @@ export default function QuizTake({
                 <div className="alert alert-error">
                   <X size={18} />
                   <span>
-                    Your answer:{" "}
-                    {picked === null ? "(none)" : question.options[picked]}
+                    Your answer: {picked === null ? "(none)" : question.options[picked]}
                   </span>
                 </div>
                 <div className="alert alert-success">
@@ -158,7 +177,7 @@ export default function QuizTake({
         </div>
       </div>
 
-      <div className="card stack">
+      <div key={index} className="card stack q-enter">
         {index === 0 && <NoteCard category="quiz" compact />}
         <h3 className="quiz-question">{q.text}</h3>
 
