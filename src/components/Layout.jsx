@@ -4,19 +4,33 @@ import { Menu, X, ChevronRight, Flower2 } from "lucide-react";
 import Logo from "./Logo.jsx";
 import MiniTimer from "./MiniTimer.jsx";
 import PetalField from "./PetalField.jsx";
+import Celebrate from "./Celebrate.jsx";
 import navItems from "./navItems.js";
 import useLocalStorage from "../hooks/useLocalStorage.js";
+import { useTimer } from "../context/TimerContext.jsx";
 
 const isMouse = (e) => e.pointerType === "mouse";
 
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const [petalsOn, setPetalsOn] = useLocalStorage("pp:petals", true);
+  const [party, setParty] = useState(0);
   const timer = useRef(null);
   const { pathname } = useLocation();
+  const { sessions } = useTimer();
+  const seenSessions = useRef(sessions.length);
 
   // Fewer, fainter petals while she is reading a lesson or taking a quiz
   const calm = pathname.startsWith("/library/") || pathname.startsWith("/quizzes");
+
+  // A celebration when a study session really finishes, on any page
+  useEffect(() => {
+    if (sessions.length > seenSessions.current) {
+      const last = sessions[sessions.length - 1];
+      if (last && last.kind === "study") setParty((n) => n + 1);
+    }
+    seenSessions.current = sessions.length;
+  }, [sessions]);
 
   function cancelClose() {
     clearTimeout(timer.current);
@@ -56,8 +70,14 @@ export default function Layout() {
         Skip to content
       </button>
 
+      {/* Soft drifting light behind every page */}
+      <div className="ambient" aria-hidden="true" />
+
       {/* Falling petals, drawn behind clicks and taps */}
       <PetalField enabled={petalsOn} calm={calm} />
+
+      {/* A burst of petals after a finished study session */}
+      {party > 0 && <Celebrate key={party} onDone={() => setParty(0)} />}
 
       {/* Top bar (phones, tablets and touch screens only) */}
       <header className="topbar">
