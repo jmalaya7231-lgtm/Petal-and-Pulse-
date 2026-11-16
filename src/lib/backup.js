@@ -20,6 +20,7 @@ const SHAPES = {
   "pp:sessions": "array",
   "pp:myNotes": "array",
   "pp:highlights": "array",
+  "pp:photo": "string",
 };
 
 function shapeMatches(value, shape) {
