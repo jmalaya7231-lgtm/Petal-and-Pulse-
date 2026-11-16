@@ -470,9 +470,10 @@ export default function LessonViewer() {
         </label>
       </div>
 
-      <article
+        <article
+        key={inOriginal ? "original" : `text-${showAll ? "all" : pageIndex}`}
         ref={articleRef}
-        className={`card reader reader-${size}${inOriginal ? " reader-original" : ""}`}
+        className={`card reader reader-${size}${inOriginal ? " reader-original" : ""} view-fade`}
         onClick={handleArticleClick}
       >
         {inOriginal ? (
