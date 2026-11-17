@@ -18,6 +18,12 @@ export default function useLocalStorage(key, initialValue) {
     } catch {
       // Storage can be blocked (e.g. private mode). The app still works.
     }
+    // Lets other parts of the app (like Poppy) know something was saved
+    try {
+      window.dispatchEvent(new CustomEvent("pp:storage", { detail: { key } }));
+    } catch {
+      // Not important
+    }
   }
 
   return [value, setAndSave];
