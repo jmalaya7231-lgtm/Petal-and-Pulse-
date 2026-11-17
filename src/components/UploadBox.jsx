@@ -3,6 +3,7 @@ import { Upload, FileText, X, RefreshCw, CheckCircle, AlertCircle } from "lucide
 import { extractPdfText, MAX_FILE_MB } from "../lib/pdfExtract.js";
 import { saveFile } from "../lib/db.js";
 import { formatBytes, makeId } from "../lib/format.js";
+import { poppyEvent } from "../lib/poppyBus.js";
 
 export default function UploadBox({ subjects, onAdd }) {
   const inputRef = useRef(null);
@@ -65,6 +66,7 @@ export default function UploadBox({ subjects, onAdd }) {
     setError("");
     setSuccess("");
     setProgress({ page: 0, total: 0 });
+    poppyEvent("upload", { state: "start" });
 
     try {
       const result = await extractPdfText(file, (page, total) =>
@@ -101,8 +103,10 @@ export default function UploadBox({ subjects, onAdd }) {
       );
       setFile(null);
       setTitle("");
+      poppyEvent("upload", { state: "done" });
     } catch (err) {
       setError(err.message || "Something went wrong while reading this PDF.");
+      poppyEvent("upload", { state: "fail" });
     } finally {
       setBusy(false);
     }
