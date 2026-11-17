@@ -1,10 +1,11 @@
 import { useEffect, useRef, useState } from "react";
 import { NavLink, Outlet, useLocation } from "react-router-dom";
-import { Menu, X, ChevronRight, Flower2 } from "lucide-react";
+import { Menu, X, ChevronRight, Flower2, Smile } from "lucide-react";
 import Logo from "./Logo.jsx";
 import MiniTimer from "./MiniTimer.jsx";
 import PetalField from "./PetalField.jsx";
 import Celebrate from "./Celebrate.jsx";
+import Poppy from "./Poppy.jsx";
 import navItems from "./navItems.js";
 import useLocalStorage from "../hooks/useLocalStorage.js";
 import { useTimer } from "../context/TimerContext.jsx";
@@ -14,6 +15,7 @@ const isMouse = (e) => e.pointerType === "mouse";
 export default function Layout() {
   const [open, setOpen] = useState(false);
   const [petalsOn, setPetalsOn] = useLocalStorage("pp:petals", true);
+  const [poppyOn, setPoppyOn] = useLocalStorage("pp:poppyOn", true);
   const [party, setParty] = useState(0);
   const timer = useRef(null);
   const { pathname } = useLocation();
@@ -61,7 +63,7 @@ export default function Layout() {
   }, []);
 
   return (
-    <div className="app-shell">
+    <div className={`app-shell${poppyOn ? " has-poppy" : ""}`}>
       <button
         type="button"
         className="skip-link"
@@ -151,6 +153,13 @@ export default function Layout() {
           >
             <Flower2 size={18} /> Falling petals: {petalsOn ? "On" : "Off"}
           </button>
+          <button
+            className="petal-toggle"
+            onClick={() => setPoppyOn(!poppyOn)}
+            aria-pressed={poppyOn}
+          >
+            <Smile size={18} /> Poppy: {poppyOn ? "On" : "Off"}
+          </button>
           <p className="muted small" style={{ margin: 0 }}>
             Made with love, for you. 💗
           </p>
@@ -166,6 +175,9 @@ export default function Layout() {
           </div>
         </div>
       </main>
+
+      {/* Poppy lives on every page */}
+      {poppyOn && <Poppy />}
     </div>
   );
 }
